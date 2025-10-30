@@ -1,17 +1,13 @@
 import React from 'react'
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
+  // Se eliminan los imports de BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts' // Esta línea puede ser eliminada completamente si recharts no se usa en ninguna otra parte.
 import { DownloadIcon, UploadIcon, UserPlusIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
-// Mock data for the charts
+
+// Mock data for the charts (manteniendo el objeto stats para las tarjetas)
 const monthlyData = [
+  // ... (datos mensuales se mantienen, aunque ya no se usan)
   {
     month: 'Ene',
     count: 12,
@@ -61,6 +57,7 @@ const monthlyData = [
     count: 9,
   },
 ]
+
 // Mock project data
 const recentProjects = [
   {
@@ -119,6 +116,7 @@ const recentProjects = [
     email: 'roberto.sanchez@ejemplo.com',
   },
 ]
+
 // Mock stats
 const stats = {
   total: 245,
@@ -129,9 +127,11 @@ const stats = {
   trabajoDirigido: 65,
   tesis: 15,
 }
+
 const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
+      {/* --- Encabezado y Acciones --- */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-[#1F2937]">Dashboard</h1>
         <div className="flex space-x-3">
@@ -152,7 +152,8 @@ const AdminDashboard: React.FC = () => {
           </button>
         </div>
       </div>
-      {/* Stats cards */}
+
+      {/* --- Tarjetas de Estadísticas (Stats cards) --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border-t-4 border-[#0B4F9F]">
           <h3 className="text-sm font-medium text-[#4B5563]">
@@ -210,47 +211,8 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* Chart */}
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h3 className="text-lg font-medium text-[#1F2937] mb-4">
-          Estadísticas de Proyectos por Modalidad
-        </h3>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={[
-                {
-                  name: 'Proyecto de Grado',
-                  value: stats.proyectoGrado,
-                  fill: '#0B4F9F',
-                },
-                {
-                  name: 'Adscripción',
-                  value: stats.adscripcion,
-                  fill: '#C62828',
-                },
-                {
-                  name: 'Trabajo Dirigido',
-                  value: stats.trabajoDirigido,
-                  fill: '#0B4F9F',
-                },
-                {
-                  name: 'Tesis',
-                  value: stats.tesis,
-                  fill: '#C62828',
-                },
-              ]}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" fill="#0B4F9F" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-      {/* Recent Projects */}
+
+      {/* --- Proyectos Recientes (Tabla) --- */}
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-[#1F2937]">
@@ -303,7 +265,11 @@ const AdminDashboard: React.FC = () => {
                   </td>
                   <td className="px-4 py-3 text-sm text-[#4B5563]">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${project.carrera === 'Informática' ? 'bg-[#0B4F9F]/10 text-[#0B4F9F]' : 'bg-[#C62828]/10 text-[#C62828]'}`}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        project.carrera === 'Informática'
+                          ? 'bg-[#0B4F9F]/10 text-[#0B4F9F]'
+                          : 'bg-[#C62828]/10 text-[#C62828]'
+                      }`}
                     >
                       {project.carrera}
                     </span>
@@ -323,4 +289,5 @@ const AdminDashboard: React.FC = () => {
     </div>
   )
 }
+
 export default AdminDashboard
