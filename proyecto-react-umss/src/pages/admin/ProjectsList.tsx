@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react' // NUEVO: Importar useState
 import { Link } from 'react-router-dom'
 import {
   PlusIcon,
@@ -7,11 +7,12 @@ import {
   TrashIcon,
   EyeIcon,
 } from 'lucide-react'
-// Mock data for projects
+
+// MODIFICADO: Mock data con códigos numéricos
 const projects = [
   {
     id: 1,
-    codigo: 'UMSS-INF-2023-00123',
+    codigo: '2235', // MODIFICADO
     titulo: 'Sistema de gestión académica para la facultad',
     tutor: 'Dr. Roberto García',
     carrera: 'Informática',
@@ -21,7 +22,7 @@ const projects = [
   },
   {
     id: 2,
-    codigo: 'UMSS-SIS-2023-00124',
+    codigo: '21456', // MODIFICADO
     titulo: 'Aplicación móvil para seguimiento de egresados',
     tutor: 'Ing. María Fernández',
     carrera: 'Sistemas',
@@ -31,7 +32,7 @@ const projects = [
   },
   {
     id: 3,
-    codigo: 'UMSS-INF-2023-00125',
+    codigo: '10045', // MODIFICADO
     titulo: 'Plataforma de aprendizaje en línea para estudiantes',
     tutor: 'Dr. Carlos Mendoza',
     carrera: 'Informática',
@@ -40,7 +41,35 @@ const projects = [
     egresado: 'Carlos Rodríguez',
   },
 ]
+
 const ProjectsList: React.FC = () => {
+  // NUEVO: Estados para los filtros y el buscador
+  const [searchQuery, setSearchQuery] = useState('')
+  const [carreraFilter, setCarreraFilter] = useState('')
+  const [modalidadFilter, setModalidadFilter] = useState('')
+
+  // NUEVO: Lógica de filtrado
+  const normalizedQuery = searchQuery.toLowerCase()
+
+  const filteredProjects = projects.filter((project) => {
+    // 1. Filtro por Buscador (Título, Egresado o Código)
+    const matchesSearch =
+      project.titulo.toLowerCase().includes(normalizedQuery) ||
+      project.codigo.toLowerCase().includes(normalizedQuery) ||
+      (project.egresado &&
+        project.egresado.toLowerCase().includes(normalizedQuery))
+
+    // 2. Filtro por Carrera
+    const matchesCarrera =
+      carreraFilter === '' || project.carrera === carreraFilter
+
+    // 3. Filtro por Modalidad
+    const matchesModalidad =
+      modalidadFilter === '' || project.modalidad === modalidadFilter
+
+    return matchesSearch && matchesCarrera && matchesModalidad
+  })
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -66,18 +95,31 @@ const ProjectsList: React.FC = () => {
           <div className="relative w-64">
             <input
               type="text"
-              placeholder="Buscar proyecto..."
+              placeholder="Buscar por título, egresado o código..." // MODIFICADO
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
+              // NUEVO: Conectar estado al input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
           <div className="flex space-x-2">
-            <select className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]">
+            <select
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
+              // NUEVO: Conectar estado al select
+              value={carreraFilter}
+              onChange={(e) => setCarreraFilter(e.target.value)}
+            >
               <option value="">Todas las carreras</option>
               <option value="Informática">Informática</option>
               <option value="Sistemas">Sistemas</option>
             </select>
-            <select className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]">
+            <select
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
+              // NUEVO: Conectar estado al select
+              value={modalidadFilter}
+              onChange={(e) => setModalidadFilter(e.target.value)}
+            >
               <option value="">Todas las modalidades</option>
               <option value="Proyecto de Grado">Proyecto de Grado</option>
               <option value="Adscripción">Adscripción</option>
@@ -88,8 +130,9 @@ const ProjectsList: React.FC = () => {
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
+            {/* ... el resto de tu thead ... */}
             <thead className="bg-gray-50">
-              <tr>
+             <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider">
                   Código
                 </th>
@@ -114,7 +157,8 @@ const ProjectsList: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {projects.map((project) => (
+              {/* MODIFICADO: Usar filteredProjects en lugar de projects */}
+              {filteredProjects.map((project) => (
                 <tr key={project.id} className="hover:bg-gray-50">
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-[#C62828]">
                     {project.codigo}
@@ -162,27 +206,17 @@ const ProjectsList: React.FC = () => {
         </div>
         <div className="mt-6 flex items-center justify-between">
           <div className="text-sm text-[#4B5563]">
+            {/* MODIFICADO: Contar los resultados filtrados */}
             Mostrando <span className="font-medium">1</span> a{' '}
-            <span className="font-medium">3</span> de{' '}
-            <span className="font-medium">3</span> resultados
+            <span className="font-medium">{filteredProjects.length}</span> de{' '}
+            <span className="font-medium">{filteredProjects.length}</span>{' '}
+            resultados
           </div>
-          <div className="flex space-x-2">
-            <button
-              className="px-3 py-1 border border-gray-300 rounded-md text-[#4B5563] hover:bg-gray-50 disabled:opacity-50"
-              disabled
-            >
-              Anterior
-            </button>
-            <button
-              className="px-3 py-1 border border-gray-300 rounded-md text-[#4B5563] hover:bg-gray-50 disabled:opacity-50"
-              disabled
-            >
-              Siguiente
-            </button>
-          </div>
+          {/* ... tu paginación (que por ahora está deshabilitada) ... */}
         </div>
       </div>
     </div>
   )
 }
+
 export default ProjectsList
