@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PlusIcon, SearchIcon, EditIcon, TrashIcon } from 'lucide-react'
 
-// Mock data for users/graduates
 const users = [
   {
     id: 1,
@@ -68,16 +67,13 @@ const UsersList: React.FC = () => {
     return users.filter(user => {
       const query = searchQuery.toLowerCase()
 
-      // Lógica de Búsqueda por Texto (Nombre, Título del Proyecto O Modalidad)
       const textMatch =
         user.nombre.toLowerCase().includes(query) ||
         user.titulo.toLowerCase().includes(query) ||
         user.modalidad.toLowerCase().includes(query)
 
-      // Filtro por Carrera (si se selecciona)
       const carreraMatch = carreraFilter === '' || user.carrera === carreraFilter
 
-      // Filtro por Modalidad (si se selecciona)
       const modalidadDropdownMatch = modalidadFilter === '' || user.modalidad === modalidadFilter
 
       return textMatch && carreraMatch && modalidadDropdownMatch
@@ -90,7 +86,6 @@ const UsersList: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        {/* Título: Aumentado de text-2xl a text-3xl */}
         <h1 className="text-3xl font-bold text-[#1F2937]"> 
           Lista de Egresados
         </h1>
@@ -111,14 +106,12 @@ const UsersList: React.FC = () => {
               placeholder="Buscar por nombre, título de proyecto o modalidad..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              // Input: Aumentado a text-base
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F] text-base" 
             />
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
 
           <div className="flex space-x-2">
-            {/* Filtros: Aumentado a text-base */}
             <select
               value={carreraFilter}
               onChange={(e) => setCarreraFilter(e.target.value)}
@@ -143,7 +136,6 @@ const UsersList: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {/* Headers: Mantienen el tamaño de text-xs, pero aumentamos el relleno de las celdas de contenido */}
                 <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider">
                   Nombre
                 </th>
@@ -170,7 +162,6 @@ const UsersList: React.FC = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  {/* Contenido de la Tabla: Aumentado el padding vertical (py-5) y el tamaño de letra (text-base) */}
                   <td className="px-4 py-5 whitespace-nowrap text-base font-medium text-[#1F2937]">
                     {user.nombre}
                   </td>
@@ -178,7 +169,6 @@ const UsersList: React.FC = () => {
                     {user.titulo}
                   </td>
                   <td className="px-4 py-5 text-base text-[#4B5563]">
-                    {/* El tag interno mantiene text-xs para que se vea como un badge */}
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         user.carrera === 'Informática'
@@ -204,10 +194,10 @@ const UsersList: React.FC = () => {
                       to={`/admin/users/${user.id}/edit`}
                       className="text-[#0B4F9F] hover:text-[#0B4F9F]/70 mr-3"
                     >
-                      <EditIcon className="h-5 w-5" /> {/* Icono un poco más grande */}
+                      <EditIcon className="h-5 w-5" /> 
                     </Link>
                     <button className="text-[#C62828] hover:text-[#C62828]/70">
-                      <TrashIcon className="h-5 w-5" /> {/* Icono un poco más grande */}
+                      <TrashIcon className="h-5 w-5" /> 
                     </button>
                   </td>
                 </tr>
@@ -221,7 +211,6 @@ const UsersList: React.FC = () => {
           )}
         </div>
 
-        {/* Paginación: Aumentado el tamaño del texto a text-base */}
         <div className="mt-6 flex items-center justify-between">
           <div className="text-base text-[#4B5563]">
             Mostrando{' '}

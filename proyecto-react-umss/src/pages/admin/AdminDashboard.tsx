@@ -1,13 +1,9 @@
 import React from 'react'
-import {
-  // Se eliminan los imports de BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts' // Esta línea puede ser eliminada completamente si recharts no se usa en ninguna otra parte.
+import { } from 'recharts'
 import { DownloadIcon, UploadIcon, UserPlusIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-// Mock data for the charts (manteniendo el objeto stats para las tarjetas)
 const monthlyData = [
-  // ... (datos mensuales se mantienen, aunque ya no se usan)
   {
     month: 'Ene',
     count: 12,
@@ -58,7 +54,6 @@ const monthlyData = [
   },
 ]
 
-// Mock project data
 const recentProjects = [
   {
     id: 1,
@@ -117,7 +112,6 @@ const recentProjects = [
   },
 ]
 
-// Mock stats
 const stats = {
   total: 245,
   informatica: 156,
@@ -131,7 +125,6 @@ const stats = {
 const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
-      {/* --- Encabezado y Acciones --- */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-[#1F2937]">Dashboard</h1>
         <div className="flex space-x-3">
@@ -153,7 +146,6 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* --- Tarjetas de Estadísticas (Stats cards) --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border-t-4 border-[#0B4F9F]">
           <h3 className="text-sm font-medium text-[#4B5563]">
@@ -212,7 +204,6 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* --- Proyectos Recientes (Tabla) --- */}
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-[#1F2937]">

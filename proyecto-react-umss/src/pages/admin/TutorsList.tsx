@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react' // Importados para futura funcionalidad de búsqueda/filtro
+import React, { useState, useMemo } from 'react' 
 import { Link } from 'react-router-dom'
 import { PlusIcon, SearchIcon, EditIcon, TrashIcon } from 'lucide-react'
 
-// Mock data for tutors
+
 const tutors = [
   {
     id: 1,
@@ -31,10 +31,9 @@ const tutors = [
 ]
 
 const TutorsList: React.FC = () => {
-  // Inicializando estados de búsqueda (aunque no se usan todavía, es buena práctica si vas a filtrar)
+  
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Filtrado simple por nombre/profesión (implementación sugerida para el futuro)
   const filteredTutors = useMemo(() => {
     const query = searchQuery.toLowerCase()
     return tutors.filter(tutor => 
@@ -50,11 +49,11 @@ const TutorsList: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          {/* Título: Aumentado de text-2xl a text-3xl */}
+          
           <h1 className="text-3xl font-bold text-[#1F2937]">
             Lista de Tutores
           </h1>
-          {/* Subtítulo: Aumentado de text-sm a text-base */}
+          
           <p className="text-base text-[#4B5563] mt-1">
             Gestiona los tutores disponibles para asignar a proyectos
           </p>
@@ -73,10 +72,10 @@ const TutorsList: React.FC = () => {
           <div className="relative w-64">
             <input
               type="text"
-              placeholder="Buscar tutor por nombre o profesión..." // Placeholder actualizado
+              placeholder="Buscar tutor por nombre o profesión..." 
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)} // Añadido handler para el estado
-              // Input: Aumentado a text-base
+              onChange={(e) => setSearchQuery(e.target.value)} 
+              
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F] text-base"
             />
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -107,7 +106,7 @@ const TutorsList: React.FC = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredTutors.map((tutor) => (
                 <tr key={tutor.id} className="hover:bg-gray-50">
-                  {/* Contenido de la Tabla: Aumentado el padding vertical (py-5) y el tamaño de letra (text-base) */}
+                  
                   <td className="px-4 py-5 whitespace-nowrap text-base font-medium text-[#1F2937]">
                     {tutor.nombre}
                   </td>
@@ -128,10 +127,10 @@ const TutorsList: React.FC = () => {
                       to={`/admin/tutors/${tutor.id}/edit`}
                       className="text-[#0B4F9F] hover:text-[#0B4F9F]/70 mr-3 inline-block"
                     >
-                      <EditIcon className="h-5 w-5" /> {/* Icono más grande */}
+                      <EditIcon className="h-5 w-5" /> 
                     </Link>
                     <button className="text-[#C62828] hover:text-[#C62828]/70 inline-block">
-                      <TrashIcon className="h-5 w-5" /> {/* Icono más grande */}
+                      <TrashIcon className="h-5 w-5" /> 
                     </button>
                   </td>
                 </tr>
@@ -140,7 +139,7 @@ const TutorsList: React.FC = () => {
           </table>
         </div>
 
-        {/* Paginación: Aumentado el tamaño del texto a text-base y padding en botones */}
+        
         <div className="mt-6 flex items-center justify-between">
           <div className="text-base text-[#4B5563]">
             Mostrando{' '}
