@@ -67,7 +67,7 @@ const Sidebar: React.FC = () => {
               }
             >
               <UsersIcon className="w-5 h-5 mr-3" />
-              <span>Egresados</span>
+              <span>Titulados</span>
             </NavLink>
             <div className="pt-2 mt-2 border-t border-gray-200">
               <p className="px-3 py-2 text-xs font-semibold text-[#4B5563] uppercase">

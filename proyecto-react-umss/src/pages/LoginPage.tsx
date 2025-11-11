@@ -88,7 +88,7 @@ const LoginPage: React.FC = () => {
                 </div>
                 <div className="ml-4 text-left">
                   <h3 className="font-medium text-[#1F2937]">
-                    Usuario / Egresado
+                    Usuario / Titulado
                   </h3>
                   <p className="text-sm text-[#4B5563]">Acceso a su proyecto</p>
                 </div>

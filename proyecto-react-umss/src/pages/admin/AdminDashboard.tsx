@@ -140,7 +140,7 @@ const AdminDashboard: React.FC = () => {
             className="flex items-center px-4 py-2 bg-[#0B4F9F] text-white rounded-md hover:bg-[#0B4F9F]/90"
           >
             <UserPlusIcon className="w-4 h-4 mr-2" />
-            Registrar Egresado
+            Registrar Titulado
           </Link>
           <button className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
             <UploadIcon className="w-4 h-4 mr-2" />

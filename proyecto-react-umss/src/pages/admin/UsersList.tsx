@@ -2,14 +2,13 @@ import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PlusIcon, SearchIcon, EditIcon, TrashIcon } from 'lucide-react'
 
-// Mock data for users/graduates
 const users = [
   {
     id: 1,
     nombre: 'Juan Pérez',
     email: 'juan.perez@ejemplo.com',
     telefono: '76543210',
-    carrera: 'Informática',
+    carrera: 'Ingeniería Informática',
     titulo: 'Sistema de gestión académica para la facultad',
     modalidad: 'Proyecto de Grado',
     fecha: '2023-05-15',
@@ -19,7 +18,7 @@ const users = [
     nombre: 'María López',
     email: 'maria.lopez@ejemplo.com',
     telefono: '76123456',
-    carrera: 'Sistemas',
+    carrera: 'Ingeniería de Sistemas',
     titulo: 'Aplicación móvil para seguimiento de egresados',
     modalidad: 'Adscripción',
     fecha: '2023-05-10',
@@ -29,7 +28,7 @@ const users = [
     nombre: 'Carlos Rodríguez',
     email: 'carlos.rodriguez@ejemplo.com',
     telefono: '70123456',
-    carrera: 'Informática',
+    carrera: 'Ingeniería Informática',
     titulo: 'Plataforma de aprendizaje en línea para estudiantes',
     modalidad: 'Trabajo Dirigido',
     fecha: '2023-05-05',
@@ -39,7 +38,7 @@ const users = [
     nombre: 'Ana Martínez',
     email: 'ana.martinez@ejemplo.com',
     telefono: '71234567',
-    carrera: 'Sistemas',
+    carrera: 'Ingeniería de Sistemas',
     titulo: 'Sistema de control de inventario para laboratorios',
     modalidad: 'Tesis',
     fecha: '2023-04-28',
@@ -49,7 +48,7 @@ const users = [
     nombre: 'Roberto Sánchez',
     email: 'roberto.sanchez@ejemplo.com',
     telefono: '72345678',
-    carrera: 'Informática',
+    carrera: 'Ingeniería Informática',
     titulo: 'Aplicación web para reserva de aulas',
     modalidad: 'Proyecto de Grado',
     fecha: '2023-04-22',
@@ -61,23 +60,20 @@ const UsersList: React.FC = () => {
   const [carreraFilter, setCarreraFilter] = useState('')
   const [modalidadFilter, setModalidadFilter] = useState('')
 
-  const carreras = ['Informática', 'Sistemas']
+  const carreras = ['Ingeniería Informática', 'Ingeniería de Sistemas']
   const modalidades = ['Proyecto de Grado', 'Adscripción', 'Trabajo Dirigido', 'Tesis']
 
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
       const query = searchQuery.toLowerCase()
 
-      // Lógica de Búsqueda por Texto (Nombre, Título del Proyecto O Modalidad)
       const textMatch =
         user.nombre.toLowerCase().includes(query) ||
         user.titulo.toLowerCase().includes(query) ||
         user.modalidad.toLowerCase().includes(query)
 
-      // Filtro por Carrera (si se selecciona)
       const carreraMatch = carreraFilter === '' || user.carrera === carreraFilter
 
-      // Filtro por Modalidad (si se selecciona)
       const modalidadDropdownMatch = modalidadFilter === '' || user.modalidad === modalidadFilter
 
       return textMatch && carreraMatch && modalidadDropdownMatch
@@ -90,16 +86,15 @@ const UsersList: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        {/* Título: Aumentado de text-2xl a text-3xl */}
         <h1 className="text-3xl font-bold text-[#1F2937]"> 
-          Lista de Egresados
+          Lista de Titulados
         </h1>
         <Link
           to="/admin/users/create"
           className="flex items-center px-4 py-2 bg-[#0B4F9F] text-white rounded-md hover:bg-[#0B4F9F]/90"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Registrar Egresado
+          Registrar Titulado
         </Link>
       </div>
 
@@ -111,14 +106,12 @@ const UsersList: React.FC = () => {
               placeholder="Buscar por nombre, título de proyecto o modalidad..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              // Input: Aumentado a text-base
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F] text-base" 
             />
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
 
           <div className="flex space-x-2">
-            {/* Filtros: Aumentado a text-base */}
             <select
               value={carreraFilter}
               onChange={(e) => setCarreraFilter(e.target.value)}
@@ -143,7 +136,6 @@ const UsersList: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {/* Headers: Mantienen el tamaño de text-xs, pero aumentamos el relleno de las celdas de contenido */}
                 <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider">
                   Nombre
                 </th>
@@ -170,7 +162,6 @@ const UsersList: React.FC = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  {/* Contenido de la Tabla: Aumentado el padding vertical (py-5) y el tamaño de letra (text-base) */}
                   <td className="px-4 py-5 whitespace-nowrap text-base font-medium text-[#1F2937]">
                     {user.nombre}
                   </td>
@@ -178,10 +169,9 @@ const UsersList: React.FC = () => {
                     {user.titulo}
                   </td>
                   <td className="px-4 py-5 text-base text-[#4B5563]">
-                    {/* El tag interno mantiene text-xs para que se vea como un badge */}
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.carrera === 'Informática'
+                        user.carrera === 'Ingeniería Informática'
                           ? 'bg-[#0B4F9F]/10 text-[#0B4F9F]'
                           : 'bg-[#C62828]/10 text-[#C62828]'
                       }`}
@@ -204,10 +194,10 @@ const UsersList: React.FC = () => {
                       to={`/admin/users/${user.id}/edit`}
                       className="text-[#0B4F9F] hover:text-[#0B4F9F]/70 mr-3"
                     >
-                      <EditIcon className="h-5 w-5" /> {/* Icono un poco más grande */}
+                      <EditIcon className="h-5 w-5" />
                     </Link>
                     <button className="text-[#C62828] hover:text-[#C62828]/70">
-                      <TrashIcon className="h-5 w-5" /> {/* Icono un poco más grande */}
+                      <TrashIcon className="h-5 w-5" />
                     </button>
                   </td>
                 </tr>
@@ -221,7 +211,6 @@ const UsersList: React.FC = () => {
           )}
         </div>
 
-        {/* Paginación: Aumentado el tamaño del texto a text-base */}
         <div className="mt-6 flex items-center justify-between">
           <div className="text-base text-[#4B5563]">
             Mostrando{' '}

@@ -51,7 +51,7 @@ const CreateEditUser: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log(formData)
-    alert('Egresado registrado correctamente')
+    alert('Titulado registrado correctamente')
     navigate('/admin/users')
   }
   return (
@@ -59,10 +59,10 @@ const CreateEditUser: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#1F2937]">
-            {isEditing ? 'Editar Egresado' : 'Registrar Nuevo Egresado'}
+            {isEditing ? 'Editar Titulado' : 'Registrar Nuevo Titulado'}
           </h1>
           <p className="text-sm text-[#4B5563] mt-1">
-            Asigne un proyecto existente al egresado
+            Asigne un proyecto existente al titulado
           </p>
         </div>
         <button
@@ -96,7 +96,7 @@ const CreateEditUser: React.FC = () => {
                 value={formData.nombre}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                placeholder="Nombre completo del egresado"
+                placeholder="Nombre completo del titulado"
                 required
               />
             </div>
