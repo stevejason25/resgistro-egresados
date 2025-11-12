@@ -1,71 +1,14 @@
 import React from 'react'
-import {
-  // Se eliminan los imports de BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts' // Esta línea puede ser eliminada completamente si recharts no se usa en ninguna otra parte.
 import { DownloadIcon, UploadIcon, UserPlusIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-// Mock data for the charts (manteniendo el objeto stats para las tarjetas)
-const monthlyData = [
-  // ... (datos mensuales se mantienen, aunque ya no se usan)
-  {
-    month: 'Ene',
-    count: 12,
-  },
-  {
-    month: 'Feb',
-    count: 19,
-  },
-  {
-    month: 'Mar',
-    count: 15,
-  },
-  {
-    month: 'Abr',
-    count: 8,
-  },
-  {
-    month: 'May',
-    count: 22,
-  },
-  {
-    month: 'Jun',
-    count: 14,
-  },
-  {
-    month: 'Jul',
-    count: 10,
-  },
-  {
-    month: 'Ago',
-    count: 7,
-  },
-  {
-    month: 'Sep',
-    count: 13,
-  },
-  {
-    month: 'Oct',
-    count: 18,
-  },
-  {
-    month: 'Nov',
-    count: 21,
-  },
-  {
-    month: 'Dic',
-    count: 9,
-  },
-]
-
-// Mock project data
 const recentProjects = [
   {
     id: 1,
     codigo: 'UMSS-INF-2023-00123',
     titulo: 'Sistema de gestión académica para la facultad',
     persona: 'Juan Pérez',
-    carrera: 'Informática',
+    carrera: 'Ingeniería Informática',
     fecha: '2023-05-15',
     modalidad: 'Proyecto de Grado',
     telefono: '76543210',
@@ -76,7 +19,7 @@ const recentProjects = [
     codigo: 'UMSS-SIS-2023-00124',
     titulo: 'Aplicación móvil para seguimiento de egresados',
     persona: 'María López',
-    carrera: 'Sistemas',
+    carrera: 'Ingeniería de Sistemas',
     fecha: '2023-05-10',
     modalidad: 'Adscripción',
     telefono: '76123456',
@@ -87,7 +30,7 @@ const recentProjects = [
     codigo: 'UMSS-INF-2023-00125',
     titulo: 'Plataforma de aprendizaje en línea para estudiantes',
     persona: 'Carlos Rodríguez',
-    carrera: 'Informática',
+    carrera: 'Ingeniería Informática',
     fecha: '2023-05-05',
     modalidad: 'Trabajo Dirigido',
     telefono: '70123456',
@@ -98,7 +41,7 @@ const recentProjects = [
     codigo: 'UMSS-SIS-2023-00126',
     titulo: 'Sistema de control de inventario para laboratorios',
     persona: 'Ana Martínez',
-    carrera: 'Sistemas',
+    carrera: 'Ingeniería de Sistemas',
     fecha: '2023-04-28',
     modalidad: 'Tesis',
     telefono: '71234567',
@@ -109,7 +52,7 @@ const recentProjects = [
     codigo: 'UMSS-INF-2023-00127',
     titulo: 'Aplicación web para reserva de aulas',
     persona: 'Roberto Sánchez',
-    carrera: 'Informática',
+    carrera: 'Ingeniería Informática',
     fecha: '2023-04-22',
     modalidad: 'Proyecto de Grado',
     telefono: '72345678',
@@ -117,7 +60,6 @@ const recentProjects = [
   },
 ]
 
-// Mock stats
 const stats = {
   total: 245,
   informatica: 156,
@@ -131,7 +73,7 @@ const stats = {
 const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
-      {/* --- Encabezado y Acciones --- */}
+      {/* Encabezado y Acciones */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-[#1F2937]">Dashboard</h1>
         <div className="flex space-x-3">
@@ -153,15 +95,11 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* --- Tarjetas de Estadísticas (Stats cards) --- */}
+      {/* Tarjetas de Estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border-t-4 border-[#0B4F9F]">
-          <h3 className="text-sm font-medium text-[#4B5563]">
-            Total Proyectos
-          </h3>
-          <p className="text-3xl font-bold text-[#1F2937] mt-2">
-            {stats.total}
-          </p>
+          <h3 className="text-sm font-medium text-[#4B5563]">Total Proyectos</h3>
+          <p className="text-3xl font-bold text-[#1F2937] mt-2">{stats.total}</p>
           <div className="mt-2 text-xs text-[#4B5563]">
             Todos los proyectos registrados
           </div>
@@ -170,16 +108,12 @@ const AdminDashboard: React.FC = () => {
           <h3 className="text-sm font-medium text-[#4B5563]">Por Carrera</h3>
           <div className="flex justify-between items-end mt-2">
             <div>
-              <p className="text-2xl font-bold text-[#1F2937]">
-                {stats.informatica}
-              </p>
-              <div className="text-xs text-[#4B5563]">Informática</div>
+              <p className="text-2xl font-bold text-[#1F2937]">156</p>
+              <div className="text-xs text-[#4B5563]">Ingeniería Informática</div>
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#1F2937]">
-                {stats.sistemas}
-              </p>
-              <div className="text-xs text-[#4B5563]">Sistemas</div>
+              <p className="text-2xl font-bold text-[#1F2937]">89</p>
+              <div className="text-xs text-[#4B5563]">Ingeniería de Sistemas</div>
             </div>
           </div>
         </div>
@@ -187,21 +121,15 @@ const AdminDashboard: React.FC = () => {
           <h3 className="text-sm font-medium text-[#4B5563]">Por Modalidad</h3>
           <div className="grid grid-cols-2 gap-4 mt-2">
             <div>
-              <p className="text-xl font-bold text-[#1F2937]">
-                {stats.proyectoGrado}
-              </p>
+              <p className="text-xl font-bold text-[#1F2937]">{stats.proyectoGrado}</p>
               <div className="text-xs text-[#4B5563]">Proyecto de Grado</div>
             </div>
             <div>
-              <p className="text-xl font-bold text-[#1F2937]">
-                {stats.adscripcion}
-              </p>
+              <p className="text-xl font-bold text-[#1F2937]">{stats.adscripcion}</p>
               <div className="text-xs text-[#4B5563]">Adscripción</div>
             </div>
             <div>
-              <p className="text-xl font-bold text-[#1F2937]">
-                {stats.trabajoDirigido}
-              </p>
+              <p className="text-xl font-bold text-[#1F2937]">{stats.trabajoDirigido}</p>
               <div className="text-xs text-[#4B5563]">Trabajo Dirigido</div>
             </div>
             <div>
@@ -212,12 +140,10 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* --- Proyectos Recientes (Tabla) --- */}
+      {/* Proyectos Recientes */}
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-[#1F2937]">
-            Proyectos Recientes
-          </h3>
+          <h3 className="text-lg font-medium text-[#1F2937]">Proyectos Recientes</h3>
           <Link
             to="/admin/projects"
             className="text-sm text-[#0B4F9F] hover:underline"
@@ -266,7 +192,7 @@ const AdminDashboard: React.FC = () => {
                   <td className="px-4 py-3 text-sm text-[#4B5563]">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        project.carrera === 'Informática'
+                        project.carrera === 'Ingeniería Informática'
                           ? 'bg-[#0B4F9F]/10 text-[#0B4F9F]'
                           : 'bg-[#C62828]/10 text-[#C62828]'
                       }`}
