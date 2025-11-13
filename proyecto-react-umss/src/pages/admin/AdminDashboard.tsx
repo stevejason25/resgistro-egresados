@@ -2,14 +2,10 @@ import React from 'react';
 import { DownloadIcon, UploadIcon, UserPlusIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-// ----------------------------------------------------------------
-// DATOS ESTÁTICOS (Mock Data - Deberán ser reemplazados por la API)
-// ----------------------------------------------------------------
-
 const recentProjects = [
   {
     id: 1,
-    codigo: 'UMSS-INF-2023-00123',
+    codigo: '0000001',
     titulo: 'Sistema de gestión académica para la facultad',
     persona: 'Juan Pérez',
     carrera: 'Ingeniería Informática',
@@ -20,7 +16,7 @@ const recentProjects = [
   },
   {
     id: 2,
-    codigo: 'UMSS-SIS-2023-00124',
+    codigo: '0000002',
     titulo: 'Aplicación móvil para seguimiento de egresados',
     persona: 'María López',
     carrera: 'Ingeniería de Sistemas',
