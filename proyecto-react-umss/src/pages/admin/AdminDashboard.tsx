@@ -1,128 +1,46 @@
-import React from 'react'
-import { } from 'recharts'
+import React, { useEffect, useMemo } from 'react'
 import { DownloadIcon, UploadIcon, UserPlusIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
-
-const monthlyData = [
-  {
-    month: 'Ene',
-    count: 12,
-  },
-  {
-    month: 'Feb',
-    count: 19,
-  },
-  {
-    month: 'Mar',
-    count: 15,
-  },
-  {
-    month: 'Abr',
-    count: 8,
-  },
-  {
-    month: 'May',
-    count: 22,
-  },
-  {
-    month: 'Jun',
-    count: 14,
-  },
-  {
-    month: 'Jul',
-    count: 10,
-  },
-  {
-    month: 'Ago',
-    count: 7,
-  },
-  {
-    month: 'Sep',
-    count: 13,
-  },
-  {
-    month: 'Oct',
-    count: 18,
-  },
-  {
-    month: 'Nov',
-    count: 21,
-  },
-  {
-    month: 'Dic',
-    count: 9,
-  },
-]
-
-const recentProjects = [
-  {
-    id: 1,
-    codigo: 'UMSS-INF-2023-00123',
-    titulo: 'Sistema de gestión académica para la facultad',
-    persona: 'Juan Pérez',
-    carrera: 'Informática',
-    fecha: '2023-05-15',
-    modalidad: 'Proyecto de Grado',
-    telefono: '76543210',
-    email: 'juan.perez@ejemplo.com',
-  },
-  {
-    id: 2,
-    codigo: 'UMSS-SIS-2023-00124',
-    titulo: 'Aplicación móvil para seguimiento de egresados',
-    persona: 'María López',
-    carrera: 'Sistemas',
-    fecha: '2023-05-10',
-    modalidad: 'Adscripción',
-    telefono: '76123456',
-    email: 'maria.lopez@ejemplo.com',
-  },
-  {
-    id: 3,
-    codigo: 'UMSS-INF-2023-00125',
-    titulo: 'Plataforma de aprendizaje en línea para estudiantes',
-    persona: 'Carlos Rodríguez',
-    carrera: 'Informática',
-    fecha: '2023-05-05',
-    modalidad: 'Trabajo Dirigido',
-    telefono: '70123456',
-    email: 'carlos.rodriguez@ejemplo.com',
-  },
-  {
-    id: 4,
-    codigo: 'UMSS-SIS-2023-00126',
-    titulo: 'Sistema de control de inventario para laboratorios',
-    persona: 'Ana Martínez',
-    carrera: 'Sistemas',
-    fecha: '2023-04-28',
-    modalidad: 'Tesis',
-    telefono: '71234567',
-    email: 'ana.martinez@ejemplo.com',
-  },
-  {
-    id: 5,
-    codigo: 'UMSS-INF-2023-00127',
-    titulo: 'Aplicación web para reserva de aulas',
-    persona: 'Roberto Sánchez',
-    carrera: 'Informática',
-    fecha: '2023-04-22',
-    modalidad: 'Proyecto de Grado',
-    telefono: '72345678',
-    email: 'roberto.sanchez@ejemplo.com',
-  },
-]
-
-const stats = {
-  total: 245,
-  informatica: 156,
-  sistemas: 89,
-  proyectoGrado: 120,
-  adscripcion: 45,
-  trabajoDirigido: 65,
-  tesis: 15,
-}
+import { useProject } from '../../context/ProjectContext'
 
 const AdminDashboard: React.FC = () => {
+  const { projects, getProjects } = useProject()
+
+  useEffect(() => {
+    if (projects.length === 0) {
+      getProjects()
+    }
+  }, [getProjects, projects.length])
+
+  const stats = useMemo(() => {
+    const informatica = projects.filter(
+      (p) => p.carrera === 'Informática',
+    ).length
+    const sistemas = projects.filter((p) => p.carrera === 'Sistemas').length
+    const proyectoGrado = projects.filter(
+      (p) => p.modalidad === 'Proyecto de Grado',
+    ).length
+    const adscripcion = projects.filter(
+      (p) => p.modalidad === 'Adscripción',
+    ).length
+    const trabajoDirigido = projects.filter(
+      (p) => p.modalidad === 'Trabajo Dirigido',
+    ).length
+    const tesis = projects.filter((p) => p.modalidad === 'Tesis').length
+
+    return {
+      total: projects.length,
+      informatica,
+      sistemas,
+      proyectoGrado,
+      adscripcion,
+      trabajoDirigido,
+      tesis,
+    }
+  }, [projects])
+
+  const recentProjects = projects.slice(0, 5)
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -145,7 +63,6 @@ const AdminDashboard: React.FC = () => {
           </button>
         </div>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border-t-4 border-[#0B4F9F]">
           <h3 className="text-sm font-medium text-[#4B5563]">
@@ -203,7 +120,6 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-[#1F2937]">
@@ -252,7 +168,7 @@ const AdminDashboard: React.FC = () => {
                     {project.titulo}
                   </td>
                   <td className="px-4 py-3 text-sm text-[#4B5563]">
-                    {project.persona}
+                    {project.egresado || 'N/A'}
                   </td>
                   <td className="px-4 py-3 text-sm text-[#4B5563]">
                     <span

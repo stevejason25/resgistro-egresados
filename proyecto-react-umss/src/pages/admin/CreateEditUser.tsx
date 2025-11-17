@@ -1,59 +1,70 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon, SaveIcon } from 'lucide-react'
-// Mock data for available projects
-const availableProjects = [
-  {
-    id: 1,
-    codigo: 'UMSS-INF-2023-00123',
-    titulo: 'Sistema de gestión académica para la facultad',
-    modalidad: 'Proyecto de Grado',
-  },
-  {
-    id: 2,
-    codigo: 'UMSS-SIS-2023-00124',
-    titulo: 'Aplicación móvil para seguimiento de egresados',
-    modalidad: 'Adscripción',
-  },
-  {
-    id: 3,
-    codigo: 'UMSS-INF-2023-00125',
-    titulo: 'Plataforma de aprendizaje en línea para estudiantes',
-    modalidad: 'Trabajo Dirigido',
-  },
-]
+import { useUserRecord } from '../../context/UserRecordContext'
+import { useProject } from '../../context/ProjectContext'
+import { IProject } from '../../types'
+import toast from 'react-hot-toast'
+import BlueInput from '../../components/ui/BlueInput'
+import BlueSelect from '../../components/ui/BlueSelect'
+import Button from '../../components/ui/Button'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { userRecordSchema, UserRecordFormData } from '../../lib/validations'
+
 const CreateEditUser: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { addUserRecord, isLoading: isSaving } = useUserRecord()
+  const { projects, getProjects } = useProject()
   const isEditing = !!id
-  const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    telefono: '',
-    carrera: 'Informática',
-    proyectoId: '',
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<UserRecordFormData>({
+    resolver: zodResolver(userRecordSchema),
+    defaultValues: {
+      nombre: '',
+      email: '',
+      telefono: '',
+      carrera: 'Informática',
+      proyectoId: 0,
+    },
   })
-  const [selectedProject, setSelectedProject] = useState<any>(null)
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-    // Update selected project when project is selected
-    if (name === 'proyectoId') {
-      const project = availableProjects.find((p) => p.id === parseInt(value))
+
+  const [selectedProject, setSelectedProject] = useState<IProject | null>(null)
+  const watchingProjectId = watch('proyectoId')
+
+  useEffect(() => {
+    if (projects.length === 0) {
+      getProjects()
+    }
+  }, [getProjects, projects.length])
+
+  useEffect(() => {
+    if (watchingProjectId) {
+      const project = projects.find(
+        (p: IProject) => p.id === Number(watchingProjectId),
+      )
       setSelectedProject(project || null)
+    } else {
+      setSelectedProject(null)
+    }
+  }, [watchingProjectId, projects])
+
+  const onSubmit: SubmitHandler<UserRecordFormData> = async (data) => {
+    try {
+      await addUserRecord(data)
+      toast.success('Egresado registrado correctamente')
+      navigate('/admin/users')
+    } catch (error) {
+      toast.error('Error al registrar al egresado')
     }
   }
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log(formData)
-    alert('Egresado registrado correctamente')
-    navigate('/admin/users')
-  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -74,115 +85,68 @@ const CreateEditUser: React.FC = () => {
         </button>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Información personal */}
             <div className="space-y-4 md:col-span-2">
               <h2 className="text-lg font-medium text-[#1F2937] border-b pb-2">
                 Información Personal
               </h2>
             </div>
-            <div>
-              <label
-                htmlFor="nombre"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Nombre Completo *
-              </label>
-              <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                placeholder="Nombre completo del egresado"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="carrera"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Carrera *
-              </label>
-              <select
-                id="carrera"
-                name="carrera"
-                value={formData.carrera}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                required
-              >
-                <option value="Informática">Informática</option>
-                <option value="Sistemas">Sistemas</option>
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Correo Electrónico *
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                placeholder="correo@ejemplo.com"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="telefono"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Número de Celular *
-              </label>
-              <input
-                type="tel"
-                id="telefono"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                placeholder="70123456"
-                required
-              />
-            </div>
-            {/* Asignación de proyecto */}
+
+            <BlueInput
+              label="Nombre Completo *"
+              type="text"
+              id="nombre"
+              placeholder="Nombre completo del egresado"
+              error={errors.nombre?.message}
+              {...register('nombre')}
+            />
+            <BlueSelect
+              label="Carrera *"
+              id="carrera"
+              error={errors.carrera?.message}
+              {...register('carrera')}
+            >
+              <option value="Informática">Informática</option>
+              <option value="Sistemas">Sistemas</option>
+            </BlueSelect>
+            <BlueInput
+              label="Correo Electrónico *"
+              type="email"
+              id="email"
+              placeholder="correo@ejemplo.com"
+              error={errors.email?.message}
+              {...register('email')}
+            />
+            <BlueInput
+              label="Número de Celular *"
+              type="tel"
+              id="telefono"
+              placeholder="70123456"
+              error={errors.telefono?.message}
+              {...register('telefono')}
+            />
+
             <div className="space-y-4 md:col-span-2 pt-4 border-t">
               <h2 className="text-lg font-medium text-[#1F2937] border-b pb-2">
                 Asignación de Proyecto
               </h2>
             </div>
+
             <div className="md:col-span-2">
-              <label
-                htmlFor="proyectoId"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Seleccionar Proyecto *
-              </label>
-              <select
+              <BlueSelect
+                label="Seleccionar Proyecto *"
                 id="proyectoId"
-                name="proyectoId"
-                value={formData.proyectoId}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                required
+                error={errors.proyectoId?.message}
+                {...register('proyectoId')}
               >
-                <option value="">Seleccione un proyecto</option>
-                {availableProjects.map((project) => (
+                <option value="0">Seleccione un proyecto</option>
+                {projects.map((project: IProject) => (
                   <option key={project.id} value={project.id}>
                     {project.codigo} - {project.titulo}
                   </option>
                 ))}
-              </select>
+              </BlueSelect>
               <p className="text-xs text-[#4B5563] mt-1">
                 ¿No encuentra el proyecto?{' '}
                 <a
@@ -193,7 +157,7 @@ const CreateEditUser: React.FC = () => {
                 </a>
               </p>
             </div>
-            {/* Información del proyecto seleccionado */}
+
             {selectedProject && (
               <div className="md:col-span-2 bg-[#F5F7FA] p-4 rounded-md">
                 <h3 className="text-sm font-medium text-[#1F2937] mb-3">
@@ -224,17 +188,19 @@ const CreateEditUser: React.FC = () => {
           </div>
           <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
             <p className="text-sm text-[#4B5563]">* Campos obligatorios</p>
-            <button
-              type="submit"
-              className="flex items-center px-6 py-2 bg-[#0B4F9F] text-white rounded-md hover:bg-[#0B4F9F]/90"
-            >
+            <Button type="submit" variant="primary" disabled={isSaving}>
               <SaveIcon className="w-4 h-4 mr-2" />
-              {isEditing ? 'Actualizar Registro' : 'Guardar Registro'}
-            </button>
+              {isSaving
+                ? 'Guardando...'
+                : isEditing
+                ? 'Actualizar Registro'
+                : 'Guardar Registro'}
+            </Button>
           </div>
         </form>
       </div>
     </div>
   )
 }
+
 export default CreateEditUser
