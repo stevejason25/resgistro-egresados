@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon, SaveIcon } from 'lucide-react'
-import { useUserRecord } from '../../context/UserRecordContext'
+import { useTitulado } from '../../context/TituladoContext'
 import { useProject } from '../../context/ProjectContext'
 import { IProject } from '../../types'
 import toast from 'react-hot-toast'
-import BlueInput from '../../components/ui/BlueInput'
-import BlueSelect from '../../components/ui/BlueSelect'
+import Input from '../../components/ui/Input'
+import Select from '../../components/ui/Select'
 import Button from '../../components/ui/Button'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { userRecordSchema, UserRecordFormData } from '../../lib/validations'
+import { tituladoSchema, TituladoFormData } from '../../lib/validations'
+import { CAREERS } from '../../lib/constants'
 
-const CreateEditUser: React.FC = () => {
+const CreateEditTitulado: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { addUserRecord, isLoading: isSaving } = useUserRecord()
+  const { addTitulado, isLoading: isSaving } = useTitulado()
   const { projects, getProjects } = useProject()
   const isEditing = !!id
 
@@ -24,8 +25,10 @@ const CreateEditUser: React.FC = () => {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<UserRecordFormData>({
-    resolver: zodResolver(userRecordSchema),
+  } = useForm<TituladoFormData>({
+    // CORRECCIÓN AQUÍ: Agregamos 'as any' para solucionar el conflicto de tipos
+    // entre el string del input HTML y el number que espera la interfaz.
+    resolver: zodResolver(tituladoSchema) as any,
     defaultValues: {
       nombre: '',
       email: '',
@@ -55,13 +58,13 @@ const CreateEditUser: React.FC = () => {
     }
   }, [watchingProjectId, projects])
 
-  const onSubmit: SubmitHandler<UserRecordFormData> = async (data) => {
+  const onSubmit: SubmitHandler<TituladoFormData> = async (data) => {
     try {
-      await addUserRecord(data)
-      toast.success('Egresado registrado correctamente')
-      navigate('/admin/users')
+      await addTitulado(data)
+      toast.success('Titulado registrado correctamente')
+      navigate('/admin/titulados')
     } catch (error) {
-      toast.error('Error al registrar al egresado')
+      toast.error('Error al registrar al titulado')
     }
   }
 
@@ -70,10 +73,10 @@ const CreateEditUser: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#1F2937]">
-            {isEditing ? 'Editar Egresado' : 'Registrar Nuevo Egresado'}
+            {isEditing ? 'Editar Titulado' : 'Registrar Nuevo Titulado'}
           </h1>
           <p className="text-sm text-[#4B5563] mt-1">
-            Asigne un proyecto existente al egresado
+            Asigne un proyecto existente al titulado
           </p>
         </div>
         <button
@@ -84,6 +87,7 @@ const CreateEditUser: React.FC = () => {
           Volver
         </button>
       </div>
+
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -93,24 +97,29 @@ const CreateEditUser: React.FC = () => {
               </h2>
             </div>
 
-            <BlueInput
+            <Input
               label="Nombre Completo *"
               type="text"
               id="nombre"
-              placeholder="Nombre completo del egresado"
+              placeholder="Nombre completo del titulado"
               error={errors.nombre?.message}
               {...register('nombre')}
             />
-            <BlueSelect
+
+            <Select
               label="Carrera *"
               id="carrera"
               error={errors.carrera?.message}
               {...register('carrera')}
             >
-              <option value="Informática">Informática</option>
-              <option value="Sistemas">Sistemas</option>
-            </BlueSelect>
-            <BlueInput
+              {CAREERS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </Select>
+
+            <Input
               label="Correo Electrónico *"
               type="email"
               id="email"
@@ -118,7 +127,8 @@ const CreateEditUser: React.FC = () => {
               error={errors.email?.message}
               {...register('email')}
             />
-            <BlueInput
+
+            <Input
               label="Número de Celular *"
               type="tel"
               id="telefono"
@@ -134,7 +144,7 @@ const CreateEditUser: React.FC = () => {
             </div>
 
             <div className="md:col-span-2">
-              <BlueSelect
+              <Select
                 label="Seleccionar Proyecto *"
                 id="proyectoId"
                 error={errors.proyectoId?.message}
@@ -146,7 +156,7 @@ const CreateEditUser: React.FC = () => {
                     {project.codigo} - {project.titulo}
                   </option>
                 ))}
-              </BlueSelect>
+              </Select>
               <p className="text-xs text-[#4B5563] mt-1">
                 ¿No encuentra el proyecto?{' '}
                 <a
@@ -186,6 +196,7 @@ const CreateEditUser: React.FC = () => {
               </div>
             )}
           </div>
+
           <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
             <p className="text-sm text-[#4B5563]">* Campos obligatorios</p>
             <Button type="submit" variant="primary" disabled={isSaving}>
@@ -203,4 +214,4 @@ const CreateEditUser: React.FC = () => {
   )
 }
 
-export default CreateEditUser
+export default CreateEditTitulado

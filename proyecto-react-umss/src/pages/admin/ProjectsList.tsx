@@ -92,7 +92,7 @@ const ProjectsList: React.FC = () => {
           <div className="relative w-64">
             <input
               type="text"
-              placeholder="Buscar por título, egresado o código..."
+              placeholder="Buscar"
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

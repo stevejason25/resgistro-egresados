@@ -1,18 +1,16 @@
 import React, { useEffect, useState, createContext, useContext } from 'react'
-type User = {
-  id: number
-  name: string
-  email: string
-  role: 'admin' | 'user'
-}
+import { IUser } from '../types'
+
 type AuthContextType = {
-  user: User | null
+  user: IUser | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   isAuthenticated: boolean
 }
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
@@ -20,28 +18,36 @@ export const useAuth = () => {
   }
   return context
 }
+
 export const AuthProvider: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<IUser | null>(null)
   const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    // Check if user is stored in localStorage
+    // Verificar si el usuario está almacenado en localStorage al cargar
     const storedUser = localStorage.getItem('user')
     if (storedUser) {
-      setUser(JSON.parse(storedUser))
+      try {
+        setUser(JSON.parse(storedUser))
+      } catch (error) {
+        console.error('Error parsing stored user:', error)
+        localStorage.removeItem('user')
+      }
     }
     setLoading(false)
   }, [])
+
   const login = async (email: string, password: string) => {
     try {
-      // Mock API call - in a real app, this would call your Laravel backend
       setLoading(true)
-      // Simulate API delay
+      // Simular llamada a API (aquí conectarás tu backend Laravel luego)
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      // Mock response based on email for demo purposes
-      let mockUser: User
-      if (email.includes('admin')) {
+
+      // Usuario simulado basado en el email para propósitos de demostración
+      let mockUser: IUser
+      if (email.toLowerCase().includes('admin')) {
         mockUser = {
           id: 1,
           name: 'Admin User',
@@ -56,6 +62,7 @@ export const AuthProvider: React.FC<{
           role: 'user',
         }
       }
+
       setUser(mockUser)
       localStorage.setItem('user', JSON.stringify(mockUser))
     } catch (error) {
@@ -65,12 +72,14 @@ export const AuthProvider: React.FC<{
       setLoading(false)
     }
   }
+
   const logout = () => {
     setUser(null)
     localStorage.removeItem('user')
-    // Opcional: Redirigir a /login
-    window.location.href = '/login';
+    // Redirigir al login forzando recarga para limpiar estados si es necesario
+    window.location.href = '/login'
   }
+
   return (
     <AuthContext.Provider
       value={{

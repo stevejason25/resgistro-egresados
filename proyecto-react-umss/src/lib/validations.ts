@@ -12,6 +12,7 @@ export const tutorSchema = z.object({
     .string()
     .min(5, { message: 'La profesión debe tener al menos 5 caracteres' }),
 })
+
 export type TutorFormData = z.infer<typeof tutorSchema>
 
 export const projectSchema = z.object({
@@ -26,9 +27,10 @@ export const projectSchema = z.object({
   descripcion: z.string().optional(),
   egresado: z.string().optional(),
 })
+
 export type ProjectFormData = z.infer<typeof projectSchema>
 
-export const userRecordSchema = z.object({
+export const tituladoSchema = z.object({
   nombre: z
     .string()
     .min(3, { message: 'El nombre debe tener al menos 3 caracteres' }),
@@ -41,4 +43,5 @@ export const userRecordSchema = z.object({
     .number()
     .min(1, { message: 'Debe seleccionar un proyecto' }),
 })
-export type UserRecordFormData = z.infer<typeof userRecordSchema>
+
+export type TituladoFormData = z.infer<typeof tituladoSchema>

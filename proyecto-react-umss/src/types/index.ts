@@ -14,7 +14,7 @@ export interface IProject {
   modalidad: string
   fecha: string
   descripcion?: string
-  egresado?: string
+  egresado?: string 
 }
 
 export interface ITutor {
@@ -26,7 +26,7 @@ export interface ITutor {
   proyectos: number
 }
 
-export interface IUserRecord {
+export interface ITitulado {
   id: number
   nombre: string
   email: string

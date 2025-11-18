@@ -1,10 +1,16 @@
-import React, { useEffect, useMemo } from 'react'
-import { DownloadIcon, UploadIcon, UserPlusIcon } from 'lucide-react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { DownloadIcon, UploadIcon, UserPlusIcon, FileTextIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useProject } from '../../context/ProjectContext'
+import { ProjectFormData } from '../../lib/validations'
+import toast from 'react-hot-toast'
+import ReportModal from '../../components/ui/ReportModal'
 
 const AdminDashboard: React.FC = () => {
-  const { projects, getProjects } = useProject()
+  const { projects, getProjects, addProject } = useProject()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  // Estado para controlar el modal de reportes PDF
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
   useEffect(() => {
     if (projects.length === 0) {
@@ -41,28 +47,159 @@ const AdminDashboard: React.FC = () => {
 
   const recentProjects = projects.slice(0, 5)
 
+  // --- LÓGICA DE EXPORTAR A CSV ---
+  const handleExport = () => {
+    if (projects.length === 0) {
+      toast.error('No hay proyectos para exportar')
+      return
+    }
+
+    const headers = [
+      'Código',
+      'Título',
+      'Tutor ID',
+      'Carrera',
+      'Modalidad',
+      'Fecha',
+      'Descripción',
+    ]
+
+    const csvContent = projects.map((p) => {
+      return [
+        p.codigo,
+        `"${p.titulo.replace(/"/g, '""')}"`, // Escapar comillas en el título
+        p.tutorId,
+        p.carrera,
+        p.modalidad,
+        p.fecha,
+        `"${(p.descripcion || '').replace(/"/g, '""')}"`,
+      ].join(',')
+    })
+
+    const csvString = [headers.join(','), ...csvContent].join('\n')
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `proyectos_umss_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success('Exportación completada')
+  }
+
+  // --- LÓGICA DE IMPORTAR CSV ---
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    
+    reader.onload = async (event) => {
+      const text = event.target?.result as string
+      if (!text) return
+
+      try {
+        const lines = text.split('\n')
+        const dataLines = lines.slice(1).filter((line) => line.trim() !== '')
+
+        let importCount = 0
+
+        for (const line of dataLines) {
+          // CSV parse simple
+          const [codigo, titulo, tutorId, carrera, modalidad, fecha, descripcion] = line.split(',')
+
+          if (codigo && titulo) {
+            const newProject: ProjectFormData = {
+              codigo: codigo.trim(),
+              titulo: titulo.replace(/"/g, '').trim(),
+              tutorId: Number(tutorId) || 0,
+              carrera: carrera?.trim() || 'Informática',
+              modalidad: modalidad?.trim() || 'Proyecto de Grado',
+              fecha: fecha?.trim() || new Date().toISOString().split('T')[0],
+              descripcion: descripcion?.replace(/"/g, '').trim() || '',
+            }
+            
+            await addProject(newProject)
+            importCount++
+          }
+        }
+
+        toast.success(`Se importaron ${importCount} proyectos exitosamente`)
+      } catch (error) {
+        console.error(error)
+        toast.error('Error al procesar el archivo CSV')
+      } finally {
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
+      }
+    }
+
+    reader.readAsText(file)
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-[#1F2937]">Dashboard</h1>
-        <div className="flex space-x-3">
+      {/* Modal de Reportes PDF */}
+      <ReportModal 
+        isOpen={isReportModalOpen} 
+        onClose={() => setIsReportModalOpen(false)} 
+      />
+
+      {/* Input oculto para CSV */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        accept=".csv" 
+        className="hidden" 
+      />
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1F2937]">Dashboard</h1>
+          <p className="text-sm text-[#4B5563]">Resumen estadístico de la facultad</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {/* Botón de Reportes (PDF) */}
+          <button
+            onClick={() => setIsReportModalOpen(true)}
+            className="flex items-center px-4 py-2 bg-[#1F2937] text-white rounded-md hover:bg-[#374151] transition-colors shadow-sm"
+          >
+            <FileTextIcon className="w-4 h-4 mr-2" />
+            Reportes
+          </button>
+
           <Link
-            to="/admin/users/create"
-            className="flex items-center px-4 py-2 bg-[#0B4F9F] text-white rounded-md hover:bg-[#0B4F9F]/90"
+            to="/admin/titulados/create"
+            className="flex items-center px-4 py-2 bg-[#0B4F9F] text-white rounded-md hover:bg-[#0B4F9F]/90 shadow-sm"
           >
             <UserPlusIcon className="w-4 h-4 mr-2" />
-            Registrar Egresado
+            Registrar Titulado
           </Link>
-          <button className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-            <UploadIcon className="w-4 h-4 mr-2" />
-            Importar
+          <button 
+            onClick={handleImportClick}
+            className="flex items-center px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-[#4B5563]"
+            title="Importar CSV"
+          >
+            <UploadIcon className="w-4 h-4" />
           </button>
-          <button className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-            <DownloadIcon className="w-4 h-4 mr-2" />
-            Exportar
+          <button 
+            onClick={handleExport}
+            className="flex items-center px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-[#4B5563]"
+            title="Exportar CSV"
+          >
+            <DownloadIcon className="w-4 h-4" />
           </button>
         </div>
       </div>
+
+      {/* Tarjetas Informativas (Sin Gráficos) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border-t-4 border-[#0B4F9F]">
           <h3 className="text-sm font-medium text-[#4B5563]">
@@ -75,6 +212,7 @@ const AdminDashboard: React.FC = () => {
             Todos los proyectos registrados
           </div>
         </div>
+
         <div className="bg-white p-6 rounded-lg shadow-sm border-t-4 border-[#C62828]">
           <h3 className="text-sm font-medium text-[#4B5563]">Por Carrera</h3>
           <div className="flex justify-between items-end mt-2">
@@ -92,6 +230,7 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+
         <div className="bg-white p-6 rounded-lg shadow-sm border-t-4 border-[#0B4F9F]">
           <h3 className="text-sm font-medium text-[#4B5563]">Por Modalidad</h3>
           <div className="grid grid-cols-2 gap-4 mt-2">
@@ -99,7 +238,7 @@ const AdminDashboard: React.FC = () => {
               <p className="text-xl font-bold text-[#1F2937]">
                 {stats.proyectoGrado}
               </p>
-              <div className="text-xs text-[#4B5563]">Proyecto de Grado</div>
+              <div className="text-xs text-[#4B5563]">Proy. de Grado</div>
             </div>
             <div>
               <p className="text-xl font-bold text-[#1F2937]">
@@ -120,6 +259,8 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Tabla Recientes */}
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-[#1F2937]">
@@ -143,9 +284,6 @@ const AdminDashboard: React.FC = () => {
                   Título
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider">
-                  Persona
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider">
                   Carrera
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider">
@@ -166,9 +304,6 @@ const AdminDashboard: React.FC = () => {
                   </td>
                   <td className="px-4 py-3 text-sm text-[#1F2937]">
                     {project.titulo}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-[#4B5563]">
-                    {project.egresado || 'N/A'}
                   </td>
                   <td className="px-4 py-3 text-sm text-[#4B5563]">
                     <span
