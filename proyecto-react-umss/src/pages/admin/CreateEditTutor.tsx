@@ -1,31 +1,47 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon, SaveIcon } from 'lucide-react'
+import { useTutor } from '../../context/TutorContext'
+import toast from 'react-hot-toast'
+import BlueInput from '../../components/ui/BlueInput'
+import Button from '../../components/ui/Button'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { tutorSchema } from '../../lib/validations'
+import { z } from 'zod'
+
+type TutorFormData = z.infer<typeof tutorSchema>
+
 const CreateEditTutor: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { addTutor, isLoading: isSaving } = useTutor()
   const isEditing = !!id
-  const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    telefono: '',
-    profesion: '',
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TutorFormData>({
+    resolver: zodResolver(tutorSchema),
+    defaultValues: {
+      nombre: '',
+      email: '',
+      telefono: '',
+      profesion: '',
+    },
   })
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+
+  const onSubmit = async (data: TutorFormData) => {
+    try {
+      await addTutor(data)
+      toast.success('Tutor registrado correctamente')
+      navigate('/admin/tutors')
+    } catch (error) {
+      toast.error('Error al registrar al tutor')
+    }
   }
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log(formData)
-    alert('Tutor registrado correctamente')
-    navigate('/admin/tutors')
-  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -34,7 +50,7 @@ const CreateEditTutor: React.FC = () => {
             {isEditing ? 'Editar Tutor' : 'Registrar Nuevo Tutor'}
           </h1>
           <p className="text-sm text-[#4B5563] mt-1">
-            Complete la información del tutor para poder asignarlo a proyectos
+            Complete la información del tutor
           </p>
         </div>
         <button
@@ -46,94 +62,56 @@ const CreateEditTutor: React.FC = () => {
         </button>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="nombre"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Nombre Completo *
-              </label>
-              <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                placeholder="Ej: Dr. Juan Pérez"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="profesion"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Profesión / Título *
-              </label>
-              <input
-                type="text"
-                id="profesion"
-                name="profesion"
-                value={formData.profesion}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                placeholder="Ej: Ingeniero de Sistemas - PhD"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Correo Electrónico *
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                placeholder="correo@umss.edu.bo"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="telefono"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Número de Celular *
-              </label>
-              <input
-                type="tel"
-                id="telefono"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0B4F9F]/50 focus:border-[#0B4F9F]"
-                placeholder="70123456"
-                required
-              />
-            </div>
+            <BlueInput
+              label="Nombre Completo *"
+              type="text"
+              id="nombre"
+              placeholder="Ej: Dr. Juan Pérez"
+              error={errors.nombre?.message}
+              {...register('nombre')}
+            />
+            <BlueInput
+              label="Profesión / Título *"
+              type="text"
+              id="profesion"
+              placeholder="Ej: Ingeniero de Sistemas - PhD"
+              error={errors.profesion?.message}
+              {...register('profesion')}
+            />
+            <BlueInput
+              label="Correo Electrónico *"
+              type="email"
+              id="email"
+              placeholder="correo@umss.edu.bo"
+              error={errors.email?.message}
+              {...register('email')}
+            />
+            <BlueInput
+              label="Número de Celular *"
+              type="tel"
+              id="telefono"
+              placeholder="70123456"
+              error={errors.telefono?.message}
+              {...register('telefono')}
+            />
           </div>
           <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
             <p className="text-sm text-[#4B5563]">* Campos obligatorios</p>
-            <button
-              type="submit"
-              className="flex items-center px-6 py-2 bg-[#0B4F9F] text-white rounded-md hover:bg-[#0B4F9F]/90"
-            >
+            <Button type="submit" variant="primary" disabled={isSaving}>
               <SaveIcon className="w-4 h-4 mr-2" />
-              {isEditing ? 'Actualizar Tutor' : 'Guardar Tutor'}
-            </button>
+              {isSaving
+                ? 'Guardando...'
+                : isEditing
+                ? 'Actualizar Tutor'
+                : 'Guardar Tutor'}
+            </Button>
           </div>
         </form>
       </div>
     </div>
   )
 }
+
 export default CreateEditTutor

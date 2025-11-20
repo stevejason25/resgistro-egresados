@@ -3,10 +3,13 @@ import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Breadcrumb from './Breadcrumb'
 import { useAuth } from '../../context/AuthContext'
+import { Toaster } from 'react-hot-toast'
+
 const Layout: React.FC = () => {
   const { logout } = useAuth()
   return (
     <div className="flex h-screen bg-[#F5F7FA]">
+      <Toaster position="top-right" reverseOrder={false} />
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white border-b border-gray-200">
@@ -27,4 +30,5 @@ const Layout: React.FC = () => {
     </div>
   )
 }
+
 export default Layout

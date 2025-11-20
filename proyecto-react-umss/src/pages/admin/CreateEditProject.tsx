@@ -1,50 +1,58 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon, SaveIcon } from 'lucide-react'
-// Mock data for tutors
+import { useProject } from '../../context/ProjectContext'
+import toast from 'react-hot-toast'
+import Input from '../../components/ui/Input'
+import Select from '../../components/ui/Select'
+import Button from '../../components/ui/Button'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { projectSchema, ProjectFormData } from '../../lib/validations'
+
 const availableTutors = [
-  {
-    id: 1,
-    nombre: 'Dr. Roberto García',
-  },
-  {
-    id: 2,
-    nombre: 'Ing. María Fernández',
-  },
-  {
-    id: 3,
-    nombre: 'Dr. Carlos Mendoza',
-  },
+  { id: 1, nombre: 'Dr. Roberto García' },
+  { id: 2, nombre: 'Ing. María Fernández' },
+  { id: 3, nombre: 'Dr. Carlos Mendoza' },
 ]
+
 const CreateEditProject: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { addProject, isLoading: isSaving } = useProject()
   const isEditing = !!id
-  const [formData, setFormData] = useState({
-    titulo: '',
-    tutorId: '',
-    carrera: 'Informática',
-    modalidad: 'Proyecto de Grado',
-    fecha: '',
-    descripcion: '',
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ProjectFormData>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: {
+      codigo: '',
+      titulo: '',
+      tutorId: 0,
+      carrera: 'Informática',
+      modalidad: 'Proyecto de Grado',
+      fecha: '',
+      descripcion: '',
+    },
   })
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+
+  const onSubmit: SubmitHandler<ProjectFormData> = async (data) => {
+    try {
+      const formattedData = {
+        ...data,
+        tutorId: Number(data.tutorId),
+      }
+      await addProject(formattedData)
+      toast.success('Proyecto guardado correctamente')
+      navigate('/admin/projects')
+    } catch (error) {
+      toast.error('Hubo un error al guardar el proyecto')
+    }
   }
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log(formData)
-    alert('Proyecto guardado correctamente')
-    navigate('/admin/projects')
-  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -65,115 +73,82 @@ const CreateEditProject: React.FC = () => {
         </button>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label
-                htmlFor="titulo"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Título del Proyecto *
-              </label>
-              <input
+              <Input
+                label="Título del Proyecto *"
                 type="text"
                 id="titulo"
-                name="titulo"
-                value={formData.titulo}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C62828]/50 focus:border-[#C62828]"
                 placeholder="Título completo del proyecto"
-                required
+                error={errors.titulo?.message}
+                {...register('titulo')}
               />
             </div>
+
             <div>
-              <label
-                htmlFor="tutorId"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Tutor Asignado *
-              </label>
-              <select
+              <Input
+                label="Código de Proyecto *"
+                type="text"
+                id="codigo"
+                placeholder="Ej: 2235"
+                error={errors.codigo?.message}
+                {...register('codigo')}
+              />
+            </div>
+
+            <div>
+              <Select
+                label="Tutor Asignado *"
                 id="tutorId"
-                name="tutorId"
-                value={formData.tutorId}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C62828]/50 focus:border-[#C62828]"
-                required
+                error={errors.tutorId?.message}
+                {...register('tutorId', { valueAsNumber: true })}
               >
-                <option value="">Seleccione un tutor</option>
+                <option value="0">Seleccione un tutor</option>
                 {availableTutors.map((tutor) => (
                   <option key={tutor.id} value={tutor.id}>
                     {tutor.nombre}
                   </option>
                 ))}
-              </select>
-              <p className="text-xs text-[#4B5563] mt-1">
-                ¿No encuentra el tutor?{' '}
-                <a
-                  href="/admin/tutors/create"
-                  className="text-[#0B4F9F] hover:underline"
-                >
-                  Registre uno nuevo
-                </a>
-              </p>
+              </Select>
             </div>
+
             <div>
-              <label
-                htmlFor="fecha"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Fecha de Defensa *
-              </label>
-              <input
+              <Input
+                label="Fecha de Defensa *"
                 type="date"
                 id="fecha"
-                name="fecha"
-                value={formData.fecha}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C62828]/50 focus:border-[#C62828]"
-                required
+                error={errors.fecha?.message}
+                {...register('fecha')}
               />
             </div>
+
             <div>
-              <label
-                htmlFor="carrera"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Carrera *
-              </label>
-              <select
+              <Select
+                label="Carrera *"
                 id="carrera"
-                name="carrera"
-                value={formData.carrera}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C62828]/50 focus:border-[#C62828]"
-                required
+                error={errors.carrera?.message}
+                {...register('carrera')}
               >
                 <option value="Informática">Informática</option>
                 <option value="Sistemas">Sistemas</option>
-              </select>
+              </Select>
             </div>
+
             <div>
-              <label
-                htmlFor="modalidad"
-                className="block text-sm font-medium text-[#4B5563] mb-1"
-              >
-                Modalidad de Titulación *
-              </label>
-              <select
+              <Select
+                label="Modalidad de Titulación *"
                 id="modalidad"
-                name="modalidad"
-                value={formData.modalidad}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C62828]/50 focus:border-[#C62828]"
-                required
+                error={errors.modalidad?.message}
+                {...register('modalidad')}
               >
                 <option value="Proyecto de Grado">Proyecto de Grado</option>
                 <option value="Adscripción">Adscripción</option>
                 <option value="Trabajo Dirigido">Trabajo Dirigido</option>
                 <option value="Tesis">Tesis</option>
-              </select>
+              </Select>
             </div>
+
             <div className="md:col-span-2">
               <label
                 htmlFor="descripcion"
@@ -183,28 +158,28 @@ const CreateEditProject: React.FC = () => {
               </label>
               <textarea
                 id="descripcion"
-                name="descripcion"
-                value={formData.descripcion}
-                onChange={handleChange}
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C62828]/50 focus:border-[#C62828]"
                 placeholder="Breve descripción del proyecto (opcional)"
+                {...register('descripcion')}
               />
             </div>
           </div>
           <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
             <p className="text-sm text-[#4B5563]">* Campos obligatorios</p>
-            <button
-              type="submit"
-              className="flex items-center px-6 py-2 bg-[#C62828] text-white rounded-md hover:bg-[#C62828]/90"
-            >
+            <Button type="submit" variant="danger" disabled={isSaving}>
               <SaveIcon className="w-4 h-4 mr-2" />
-              {isEditing ? 'Actualizar Proyecto' : 'Guardar Proyecto'}
-            </button>
+              {isSaving
+                ? 'Guardando...'
+                : isEditing
+                ? 'Actualizar Proyecto'
+                : 'Guardar Proyecto'}
+            </Button>
           </div>
         </form>
       </div>
     </div>
   )
 }
+
 export default CreateEditProject
